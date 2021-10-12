@@ -1,9 +1,6 @@
 package com.akgarg.ServiceMain.controller;
 
-import com.akgarg.ServiceMain.model.Movie;
-import com.akgarg.ServiceMain.model.MovieInfo;
-import com.akgarg.ServiceMain.model.Rating;
-import com.akgarg.ServiceMain.model.RatingsApiResponse;
+import com.akgarg.ServiceMain.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,17 +35,22 @@ public class WebClientController {
 
         return ratings.stream()
                 .map(rating -> {
-                    Movie movie = webClientBuilder.build(). // builds a new client
+                    MovieResponse movieResponse = webClientBuilder.build(). // builds a new client
                             get()   // method type of request (couldbe POST, DELETE etc.)
                             .uri("http://movie-microservice-one/movie/" + rating.getId())  // URI where to make request
                             .retrieve() // fetch content from the requested uri
-                            .bodyToMono(Movie.class)    // converts received data string into provided class object
+                            .bodyToMono(MovieResponse.class)    // converts received data string into provided class object
                             .block();
                     // blocks execution of further LOCs to prevent data corruption or exceptions,
                     // makes this request kind of synchronous
 
                     // bodyToMono is actually reactive way to say that we will get object not right now
                     // but after few monents. It's like a promise that we will surely get this object asynchronously.
+                    Movie movie = movieResponse.getPayload();
+
+                    if (movie == null) {
+                        return new MovieInfo(null, null, 0);
+                    }
                     return new MovieInfo(movie.getName(),
                             movie.getDescription(),
                             rating.getRating());
