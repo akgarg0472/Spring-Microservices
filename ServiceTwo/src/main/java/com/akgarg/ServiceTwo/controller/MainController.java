@@ -24,7 +24,8 @@ public class MainController {
     public RatingsApiResponse getRatings(@PathVariable("userId") String userId) {
         List<Rating> ratings = new ArrayList<>();
         for (int i = 0; i < userId.length(); i++) {
-            ratings.add(new Rating(userId + "->" + i, 1 + new Random().nextInt(5)));
+            int id = ((Integer.parseInt(userId) < 10 ? Integer.parseInt(userId) * 10 : Integer.parseInt(userId)));
+            ratings.add(new Rating(String.valueOf(id), 1 + new Random().nextInt(5)));
         }
 
         return new RatingsApiResponse("Ratings generated successfully", ratings);
